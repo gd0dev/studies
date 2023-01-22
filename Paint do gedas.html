@@ -1,0 +1,118 @@
+<!------------------------------------------------------------------------------------>
+<!--Opa, tudo certinho? Esse é um estudo focado em formas de manipulação de funções--->
+<!--e trabalhos visuais, como uma forma de "Paint".----------------------------------->
+
+<meta charset = "utf-8"> <!--//Gabriel Dias Castelo Branco - github.com/gd0dev-->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> <!--incluo a biblioteca css Font Awesome no meu projeto-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.1/css/bulma.min.css"><!--incluo a biblioteca de css Bulma-->
+                                                                 
+<canvas width="600" height="400" id="canvas"></canvas> 
+                                                                 
+<br>
+Cor <input class = "is-outlined" type="color" id="input"> <!--cria um selecionador de cores--> 
+
+<br>
+<button class="button is-primary is-outlined"id="icon-button" onclick="selecionaPincel()"> <!--Cria botão com ícone de pincel da biblioteca css Font Awesome-->
+<i class="fas fa-paint-brush"></i>
+  </button>
+<br>
+<button class="button is-primary is-outlined" id="icon-button2" onclick="selecionaBorracha()"> <!--Cria botão com ícone de borracha da biblioteca css Font Awesome-->
+  <i class="fas fa-eraser"></i>
+  </button>
+
+<br>
+<input type="range" id="raioPincel" min="0" max="100" value="20">
+
+<br>
+<canvas width="120" height="120" id="preview"></canvas>
+
+<script>
+  var getRaio = document.getElementById('raioPincel')
+
+  var preview = document.getElementById('preview')
+  var previewPincel = preview.getContext('2d')
+  previewPincel.fillStyle = 'white';
+  previewPincel.fillRect(0, 0, preview.width, preview.height);
+  previewPincel.beginPath()
+
+  var tela = document.getElementById('canvas'); //transforma meu canvas numa var trabalhavel
+  var cor = document.getElementById('input'); //transforma o return do meu input criado no HTML, em uma var trabalhavel em JS
+  var pincel = tela.getContext('2d'); //crio a var pincel, sendo ela o contexto da tela em 2d
+  pincel.fillStyle = 'grey'; //cor cinza do background
+  pincel.fillRect(0, 0, canvas.width, canvas.height);//preencho um retangulo com a cor atribuida a 'pincel'
+
+
+
+  var botaopincel = document.getElementById('pincel'); //garantindo a var de cada botão para trabalhar caso precise
+  var botaoborracha = document.getElementById('borracha');
+
+
+  var desenha = false; //garanto que meu pincel não vai começar desenhando sozinho
+  var apaga = false; // garanto o modo apaga controlado
+  var modo = ['pincel', 'borracha']; //array de modos
+  var seletor = 'pincel'; // começando pelo pincel
+ 
+ 
+  function desenhaCirculo(evento) { //Função de um pincel genérico em formato de círculo opaco.
+
+    if (desenha) {//se o modo clique esquerdo tiver ativado:
+    if (seletor == modo[1] ) {//modo borracha
+      var x = evento.pageX - tela.offsetLeft; //atribuo coordenadas corrigidas a uma variável x. (diferença da página com o espaço offset)
+      var y = evento.pageY - tela.offsetTop;
+      pincel.fillStyle = 'grey'; //borracha da mesma cor do fundo
+      pincel.beginPath(); //inicio pincel
+      pincel.arc(x, y, getRaio.value, 0, 2 * 3.14); // garanto as especificações do arco a ser desenhado
+      pincel.fill(); //preencho o círculo especificado.
+    }
+    
+    if (seletor == modo[0]) {//agora modo pincel (semelhante a borracha, mas agora com a cor dada pelo input)
+      var x = evento.pageX - tela.offsetLeft;
+      var y = evento.pageY - tela.offsetTop;
+      var color = cor.value; //atribuo uma var manipulavel ao valor da cor atribuido pelo input na linha 15
+      pincel.fillStyle = color; //pincel da cor atribuida
+      pincel.beginPath();
+      pincel.arc(x, y, getRaio.value, 0, 2 * 3.14);
+      pincel.fill();
+    }
+  }
+
+  getRaio.oninput = function() {
+    previewPincel.clearRect(0, 0, preview.width, preview.height);
+    previewPincel.beginPath();
+    previewPincel.arc(preview.width/2, preview.height/2, getRaio.value, 0, 2*3.14);
+    previewPincel.stroke();
+
+    previewPincel.font = '12px serif';
+    previewPincel.strokeText(getRaio.value + "px", preview.width/2, preview.height/2);
+    console.log(getRaio.value);
+}
+
+
+
+
+
+}
+  tela.onmousemove = desenhaCirculo; //garanto que com o mouse em movimento a função desenhaCirculo ative
+  tela.onmousedown = habilitaDesenhar; //garanto com o clique do mouse a função habilitaDesenhar ative
+  tela.onmouseup = desabilitaDesenhar; //garanto com o "desclique" do mouse a função desabilitaDesenhar ative
+
+  function habilitaDesenhar() { //modo desenhar ativado
+    desenha = true;
+  }
+
+  function desabilitaDesenhar() {//modo desenhar desativado
+    desenha = false;    
+  }
+
+
+  function selecionaBorracha() {//atribui a opção borracha ao seletor
+    seletor = 'borracha'
+
+  }
+
+  function selecionaPincel() {//atribui a opção pincel ao seletor
+    seletor = 'pincel';
+  }
+
+</script>
